@@ -16,10 +16,13 @@ TDD(赤→緑→リファクタ)の流れをデモで直感的に見せるため
 ## アプローチ
 一案のみ。ロジックを純粋関数に切り出し、UIは薄く置く。TDDの対象を関数に絞れるため、他の構成は目的に合わない。
 
-## 構成
-- `src/lib/calculator.ts`: 純粋関数。初期実装は `add(a, b)` のみ。
-- `src/lib/calculator.test.ts`: `add` のテスト1本(通る状態)。
-- `src/app/page.tsx`: 数字ボタン、`+`、`=`、表示欄のみ。
+## 構成(改訂: 画面の状態遷移もロジックに切り出す)
+- `src/lib/calculator.ts`: 純粋関数。`add(a, b)`、状態 `State { display, left, fresh }`、`initialState`、`press(state, key): State`。
+- `src/lib/calculator.test.ts`: `add` と `press` のテスト(数字入力、`2 + 3 = 5`、連打の無視)。
+- `src/app/page.tsx`: `press` を呼ぶだけの薄いUI。
 
-## 初期状態で未実装(デモで足す)
-減算、乗算、除算、小数、クリア、ゼロ除算。
+## 初期状態で未実装(デモで足す。この順を想定)
+1. 減算
+2. 連続計算(`5 - 3 - 1`。演算子を覚える state が必要)
+3. ゼロ除算
+4. 小数(`0.1 + 0.2`)、クリア
