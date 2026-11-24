@@ -1,69 +1,41 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
+
+import { useState } from "react";
+import { add } from "@/lib/calculator";
 
 export default function Home() {
+  const [display, setDisplay] = useState("0");
+  const [left, setLeft] = useState<number | null>(null);
+  const [fresh, setFresh] = useState(true); // 次の数字入力で表示を置き換えるか
+
+  const pressDigit = (d: string) => {
+    setDisplay(fresh || display === "0" ? d : display + d);
+    setFresh(false);
+  };
+
+  const pressPlus = () => {
+    if (fresh) return; // 数字未入力での連打は無視
+    setLeft(left === null ? Number(display) : add(left, Number(display)));
+    setFresh(true);
+  };
+
+  const pressEquals = () => {
+    if (left === null || fresh) return;
+    setDisplay(String(add(left, Number(display))));
+    setLeft(null);
+    setFresh(true);
+  };
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className={styles.intro}>
-          <h1>
-            To get started, edit the{" "}
-            <code className={styles.code}>page.tsx</code> file.
-          </h1>
-          <p>
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className={styles.secondary}
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+    <main className="calc">
+      <div className="display" data-testid="display">{display}</div>
+      <div className="keys">
+        {["7", "8", "9", "4", "5", "6", "1", "2", "3", "0"].map((d) => (
+          <button key={d} onClick={() => pressDigit(d)}>{d}</button>
+        ))}
+        <button onClick={pressPlus}>+</button>
+        <button onClick={pressEquals}>=</button>
+      </div>
+    </main>
   );
 }
